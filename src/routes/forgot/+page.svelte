@@ -1,7 +1,9 @@
 <script>
 	import { goto } from '$app/navigation';
 	import { Label, Input, GradientButton, A, Img, Span } from 'flowbite-svelte';
-	import '../../app.css';
+
+	/** @type {import('./$types').PageData} */
+	export let data;
 
 	const form = {
 		email: ''
@@ -28,14 +30,10 @@
 	}
 </script>
 
-<svelte:head>
-	<title>忘记密码</title>
-</svelte:head>
-
 <div class="flex min-h-screen">
 	<div class="flex flex-auto">
 		<Img
-			src="https://api.kdcc.cn"
+			bind:src={data.url}
 			alt="sample 1"
 			class="sm:w-1/2 xl:w-3/5 h-full overflow-hidden bg-no-repeat bg-cover transition-all duration-300 blur-sm hover:blur-none"
 		/>

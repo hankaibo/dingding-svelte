@@ -2,7 +2,9 @@
 	import { goto } from '$app/navigation';
 	import { Label, Input, Button, GradientButton, Checkbox, A, Hr, Img } from 'flowbite-svelte';
 	import { FacebookSolid, TwitterSolid, GoogleSolid, AppleSolid } from 'flowbite-svelte-icons';
-	import '../../app.css';
+
+	/** @type {import('./$types').PageData} */
+	export let data;
 
 	const form = {
 		email: '',
@@ -34,17 +36,13 @@
 	}
 </script>
 
-<svelte:head>
-	<title>登录</title>
-</svelte:head>
-
 <div class="min-h-screen flex">
 	<div
 		class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0"
 	>
 		<Img
-			src="https://api.kdcc.cn"
-			alt="sample 1"
+			bind:src={data.url}
+			alt="login logo"
 			class="sm:w-1/2 xl:w-3/5 h-full overflow-hidden bg-no-repeat bg-cover transition-all duration-300 blur-sm hover:blur-none"
 		/>
 		<div

@@ -13,7 +13,6 @@
 		DropdownHeader,
 		DropdownDivider
 	} from 'flowbite-svelte';
-	import '../../app.css';
 
 	/** @type {import('./$types').LayoutData}*/
 	export let data;

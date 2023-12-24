@@ -6,6 +6,7 @@
 		Tooltip,
 		Select,
 		Checkbox,
+		Modal,
 		Button,
 		Table,
 		TableBody,
@@ -14,6 +15,7 @@
 		TableHead,
 		TableHeadCell
 	} from 'flowbite-svelte';
+	import Upload from './upload.svelte';
 
 	$: name = '';
 	$: offset = '';
@@ -23,6 +25,7 @@
 		{ value: '60', name: '60分钟' }
 	];
 	$: hidden = false;
+	let defaultModal = false;
 
 	let tableData = [];
 
@@ -174,6 +177,8 @@
 	<Button on:click={getList}>查询</Button>
 </div>
 
+<Button on:click={() => (defaultModal = true)}>上传</Button>
+
 <Table hoverable={true} shadow>
 	<TableHead defaultRow={false}>
 		<tr>
@@ -247,3 +252,7 @@
 		</tr>
 	</tfoot>
 </Table>
+
+<Modal title="上传考勤表" bind:open={defaultModal} autoclose>
+	<Upload />
+</Modal>
