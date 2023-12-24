@@ -12,7 +12,7 @@
 	}
 
 	async function uploadFile(formData) {
-		const url = '/api/dingding/upload';
+		const url = '/api/attendance-report/upload';
 		const res = await fetch(url, {
 			method: 'post',
 			body: formData

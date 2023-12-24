@@ -35,7 +35,7 @@
 	<title>{$page.data.title}</title>
 </svelte:head>
 
-<Navbar>
+<Navbar class="border-b border-gray-200">
 	<NavBrand href="/">
 		<img
 			src="https://svelte.dev/_app/immutable/assets/svelte-logo.5c5d7d20.svg"
