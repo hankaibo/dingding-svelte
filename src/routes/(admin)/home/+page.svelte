@@ -18,19 +18,24 @@
 	import Upload from './upload.svelte';
 
 	$: name = '';
+	$: date = '2021-10-01';
 	$: offset = '';
 	let offsetOptions = [
 		{ value: '0', name: '0分钟' },
 		{ value: '30', name: '30分钟' },
 		{ value: '60', name: '60分钟' }
 	];
-	$: hidden = false;
+	$: hidden = true;
 	let defaultModal = false;
 
 	let tableData = [];
 
 	let sumOvertimeWeekend = 0;
 	let sumOvertimeWeekday = 0;
+	let sumOvertimeWeekendAfter = 0;
+	let sumOvertimeWeekdayAfter = 0;
+	let sumOvertimeWeekendAfterBase = 0;
+	let sumOvertimeWeekdayAfterBase = 0;
 	let sumResttime = 0;
 
 	const baseTime = new Date('2023-11-26 17:30:00');
@@ -55,12 +60,16 @@
 	async function getList() {
 		sumOvertimeWeekend = 0;
 		sumOvertimeWeekday = 0;
+		sumOvertimeWeekendAfter = 0;
+		sumOvertimeWeekdayAfter = 0;
+		sumOvertimeWeekendAfterBase = 0;
+		sumOvertimeWeekdayAfterBase = 0;
 		sumResttime = 0;
 
 		const params = new URLSearchParams();
 		params.append('page', '' + 1);
 		params.append('limit', '' + 1000);
-		params.append('filters', '{"name":"' + name + '"}');
+		params.append('filters', `{"name": "${name}", "date": "${date}"}`);
 		const res = await fetch(`/api/attendance-report?${params}`, {
 			method: 'get',
 			headers: {
@@ -94,8 +103,8 @@
 				let overtime = 0; // 原始加班时间，单位分钟
 				let overtimeAfter = 0; // 扣除晚上吃饭时间后的加班时间，单位分钟
 				let base = 0; // 加班基数：工作日1.5，周末2
-				let overtimeWeekend = 0;
-				let overtimeWeekday = 0;
+				let overtimeAfterBaseWeekday = 0;
+				let overtimeAfterBaseWeekend = 0;
 
 				if (user.endTime) {
 					if ((day === 0 || day === 6) && !workDay.includes(user.workDate)) {
@@ -106,10 +115,14 @@
 						const end = new Date(`2023-11-26 ${endTimeAfter}:00`);
 						const start = new Date(`2023-11-26 ${user.startTime}:00`);
 						overtime = (end - start) / 60000;
+						sumOvertimeWeekend += overtime;
+
 						//  周末不用偏移
 						overtimeAfter = overtime;
-						overtimeWeekend = (Number.isNaN(overtimeAfter) ? 0 : overtimeAfter) * base;
-						sumOvertimeWeekend += overtimeWeekend;
+						sumOvertimeWeekendAfter += overtimeAfter;
+						//
+						overtimeAfterBaseWeekend = (Number.isNaN(overtimeAfter) ? 0 : overtimeAfter) * base;
+						sumOvertimeWeekendAfterBase += overtimeAfterBaseWeekend;
 					} else {
 						base = 1.5;
 
@@ -126,15 +139,17 @@
 							// 计算2个时间的差
 							const end = new Date(`2023-11-26 ${endTimeAfter}:00`);
 							overtime = (end - baseTime) / 60000;
+							sumOvertimeWeekday += overtime;
+
 							if (offset) {
 								overtimeAfter = overtime - offset;
 							} else {
 								overtimeAfter = overtime;
 							}
-							// 加班时长 = 加班基数 * 加班时间
-							overtimeWeekday = (Number.isNaN(overtimeAfter) ? 0 : overtimeAfter) * base;
-							// 累加加班时长
-							sumOvertimeWeekday += overtimeWeekday;
+							sumOvertimeWeekdayAfter += overtimeAfter;
+
+							overtimeAfterBaseWeekday = (Number.isNaN(overtimeAfter) ? 0 : overtimeAfter) * base;
+							sumOvertimeWeekdayAfterBase += overtimeAfterBaseWeekday;
 						}
 					}
 				}
@@ -150,8 +165,8 @@
 					overtime,
 					overtimeAfter,
 					base,
-					overtimeWeekend,
-					overtimeWeekday
+					overtimeAfterBaseWeekend,
+					overtimeAfterBaseWeekday
 				};
 			})
 			.filter((user) => {
@@ -168,19 +183,22 @@
 	});
 </script>
 
-<div class="grid gap-6 items-end w-full md:grid-cols-4 py-2">
+<div class="grid gap-6 items-end w-full md:grid-cols-5 py-2">
 	<FloatingLabelInput id="floating_filled" name="name" type="text" bind:value={name}>
 		姓名
+	</FloatingLabelInput>
+	<FloatingLabelInput id="floating_filled" name="date" type="date" bind:value={date}>
+		开始日期
 	</FloatingLabelInput>
 	<Select items={offsetOptions} bind:value={offset} placeholder="晚上加班扣除吃饭时间" />
 	<Checkbox bind:checked={hidden}>隐藏未加班数据</Checkbox>
 	<Button on:click={getList}>查询</Button>
 </div>
 
-<Button on:click={() => (defaultModal = true)}>上传</Button>
+<Button on:click={() => (defaultModal = true)} class="hidden">上传</Button>
 
 <Table hoverable={true} shadow>
-	<TableHead defaultRow={false}>
+	<TableHead defaultRow={false} class="border-b">
 		<tr>
 			<TableHeadCell rowspan="2">姓名</TableHeadCell>
 			<TableHeadCell rowspan="2" class="bg-white">日期</TableHeadCell>
@@ -230,24 +248,38 @@
 				<TableBodyCell class="text-right">{item.overtime}</TableBodyCell>
 				<TableBodyCell class="text-right">{item.overtimeAfter}</TableBodyCell>
 				<TableBodyCell class="bg-gray-50 dark:bg-gray-800 text-right">{item.base}</TableBodyCell>
-				<TableBodyCell class="text-right">{item.overtimeWeekday}</TableBodyCell>
-				<TableBodyCell class="text-right">{item.overtimeWeekend}</TableBodyCell>
+				<TableBodyCell class="text-right">{item.overtimeAfterBaseWeekday}</TableBodyCell>
+				<TableBodyCell class="text-right">{item.overtimeAfterBaseWeekend}</TableBodyCell>
 				<TableBodyCell class="bg-gray-50 dark:bg-gray-800 text-right">{item.rest}</TableBodyCell>
 			</TableBodyRow>
 		{/each}
 	</TableBody>
-	<tfoot>
+	<tfoot class="border-t">
 		<tr class="font-semibold text-gray-900 dark:text-white">
-			<th scope="row" class="py-3 px-6 text-base text-right" colspan="9" rowspan="2"
+			<th
+				scope="row"
+				class="py-3 px-6 text-base text-right bg-gray-50 dark:bg-gray-800"
+				colspan="6"
+				rowspan="2">合计(单位:分)</th
+			>
+			<td class="py-3 px-6" colspan="2" rowspan="2">
+				<span class="block text-right">
+					原始加班时长：{sumOvertimeWeekday}(工作日), {sumOvertimeWeekend}(周末)</span
+				>
+				<span class="block text-right"
+					>调整后加班时长：{sumOvertimeWeekdayAfter}(工作日), {sumOvertimeWeekendAfter}(周末)</span
+				>
+			</td>
+			<th scope="row" class="py-3 px-6 text-base text-right bg-gray-50 dark:bg-gray-800" rowspan="2"
 				>合计(单位:天)</th
 			>
-			<td class="py-3 px-6">{sumOvertimeWeekday / (60 * 8)}</td>
-			<td class="py-3 px-6">{sumOvertimeWeekend / (60 * 8)}</td>
-			<td class="py-3 px-6" rowspan="2">{sumResttime}</td>
+			<td class="py-3 px-6 text-right">{sumOvertimeWeekdayAfterBase / (60 * 8)}</td>
+			<td class="py-3 px-6 text-right">{sumOvertimeWeekendAfterBase / (60 * 8)}</td>
+			<td class="py-3 px-6 text-right bg-gray-50 dark:bg-gray-800" rowspan="2">{sumResttime}</td>
 		</tr>
 		<tr class="font-semibold text-gray-900 dark:text-white">
-			<td class="py-3 px-6 text-right" colspan="2"
-				>{(sumOvertimeWeekday + sumOvertimeWeekend) / (60 * 8)}</td
+			<td class="py-3 px-6 text-right border-t" colspan="2"
+				>{(sumOvertimeWeekdayAfterBase + sumOvertimeWeekendAfterBase) / (60 * 8)}</td
 			>
 		</tr>
 	</tfoot>
