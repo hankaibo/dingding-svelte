@@ -13,6 +13,10 @@
 	} from 'flowbite-svelte';
 
 	$: activeUrl = $page.url.searchParams.get('page');
+
+	/**
+	 * @type {any[]}
+	 */
 	let pages = [
 		{ name: 1, href: '/components/pagination?page=1' },
 		{ name: 2, href: '/components/pagination?page=2' },
@@ -45,6 +49,16 @@
 
 	let pageSize = 5;
 	let pageNum = 1;
+	/**
+	 * @typedef User
+	 * @property {number} id
+	 * @property {string} email
+	 * @property {string} provider
+	 * @property {string} make
+	 */
+	/**
+	 * @type {User[]}
+	 */
 	let tableData = [];
 	let searchTerm = '';
 
@@ -66,17 +80,17 @@
 	 * 删除用户
 	 * @param {number} id
 	 */
-	async function handleDelete(id) {
-		const res = await fetch(`/api/users/${id}`, {
-			method: 'delete',
-			headers: {
-				Authorization: `Bearer ${localStorage.getItem('token')}`
-			}
-		});
-		if (res.ok) {
-			getList();
-		}
-	}
+	// async function handleDelete(id) {
+	// 	const res = await fetch(`/api/users/${id}`, {
+	// 		method: 'delete',
+	// 		headers: {
+	// 			Authorization: `Bearer ${localStorage.getItem('token')}`
+	// 		}
+	// 	});
+	// 	if (res.ok) {
+	// 		getList();
+	// 	}
+	// }
 
 	onMount(() => {
 		getList();
@@ -102,7 +116,7 @@
 			<span class="sr-only">Edit</span>
 		</TableHeadCell>
 	</TableHead>
-	<TableBody class="divide-y">
+	<TableBody tableBodyClass="divide-y">
 		{#each tableData as item}
 			<TableBodyRow>
 				<TableBodyCell class="!p-4">

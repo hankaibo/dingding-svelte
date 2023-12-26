@@ -1,8 +1,28 @@
 <script>
+	/**
+	 * @typedef User
+	 * @property {string} name
+	 * @property {string} workDate
+	 * @property {string | number} [dayLabel]
+	 * @property {string | number} startTime
+	 * @property {string} endTime
+	 * @property {string} [endTimeAfter]
+	 * @property {string | number} [overtime]
+	 * @property {string | number} [overtimeAfter]
+	 * @property {string | number} [base]
+	 * @property {string | number} [overtimeAfterBaseWeekday]
+	 * @property {string | number} [overtimeAfterBaseWeekend]
+	 * @property {string | number} rest
+	 */
+
+	/**
+	 * @typedef Resp
+	 * @property {User[]} data
+	 */
+
 	import { onMount } from 'svelte';
 	import {
 		FloatingLabelInput,
-		// Datepicker,
 		Tooltip,
 		Select,
 		Checkbox,
@@ -28,6 +48,9 @@
 	$: hidden = true;
 	let defaultModal = false;
 
+	/**
+	 * @type {User[]}
+	 */
 	let tableData = [];
 
 	let sumOvertimeWeekend = 0;
@@ -76,8 +99,10 @@
 				Authorization: `Bearer ${localStorage.getItem('token')}`
 			}
 		});
+		/**
+		 * @type {Resp}
+		 */
 		const users = await res.json();
-
 		tableData = users.data
 			.map((user) => {
 				let day = new Date(user.workDate).getDay();
@@ -114,7 +139,7 @@
 						// 计算2个时间的差
 						const end = new Date(`2023-11-26 ${endTimeAfter}:00`);
 						const start = new Date(`2023-11-26 ${user.startTime}:00`);
-						overtime = (end - start) / 60000;
+						overtime = (+end - +start) / 60000;
 						sumOvertimeWeekend += overtime;
 
 						//  周末不用偏移
@@ -138,11 +163,11 @@
 
 							// 计算2个时间的差
 							const end = new Date(`2023-11-26 ${endTimeAfter}:00`);
-							overtime = (end - baseTime) / 60000;
+							overtime = (+end - +baseTime) / 60000;
 							sumOvertimeWeekday += overtime;
 
 							if (offset) {
-								overtimeAfter = overtime - offset;
+								overtimeAfter = overtime - +offset;
 							} else {
 								overtimeAfter = overtime;
 							}
@@ -234,7 +259,7 @@
 			<TableHeadCell class="text-center bg-white">周末</TableHeadCell>
 		</tr>
 	</TableHead>
-	<TableBody class="divide-y">
+	<TableBody tableBodyClass="divide-y">
 		{#each tableData as item}
 			<TableBodyRow>
 				<TableBodyCell class="bg-gray-50 dark:text-white dark:bg-gray-800"

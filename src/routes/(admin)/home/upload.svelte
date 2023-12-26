@@ -1,4 +1,7 @@
 <script>
+	/**
+	 * @type {FileList}
+	 */
 	let files;
 
 	$: if (files) {
@@ -11,6 +14,10 @@
 		uploadFile(formData);
 	}
 
+	/**
+	 * 上传文件.
+	 * @param {FormData} formData - 对象.
+	 */
 	async function uploadFile(formData) {
 		const url = '/api/attendance-report/upload';
 		const res = await fetch(url, {
