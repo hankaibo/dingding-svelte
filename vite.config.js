@@ -15,7 +15,7 @@ export default defineConfig({
 				target: 'https://cn.bing.com',
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/bing/, '')
-			},
+			}
 		}
 	}
 });

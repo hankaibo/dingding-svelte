@@ -7,4 +7,4 @@
 	<title>{$page.data.title}</title>
 </svelte:head>
 
-<slot></slot>
+<slot />
