@@ -1,40 +1,27 @@
 <script>
-	import { goto } from '$app/navigation';
-	import { Label, Input, Button, GradientButton, Checkbox, A, Hr, Img } from 'flowbite-svelte';
+	import {
+		Label,
+		Helper,
+		Input,
+		Button,
+		GradientButton,
+		Checkbox,
+		A,
+		Hr,
+		Img
+	} from 'flowbite-svelte';
 	import { FacebookSolid, TwitterSolid, GoogleSolid, AppleSolid } from 'flowbite-svelte-icons';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 
-	const form = {
-		email: '',
-		password: ''
-	};
-
-	async function handleLogin() {
-		const url = '/api/auth/email/login';
-		const res = await fetch(url, {
-			method: 'post',
-			body: JSON.stringify(form),
-			headers: {
-				'Content-Type': 'application/json'
-			}
-		});
-		if (res.ok) {
-			const data = await res.json();
-			localStorage.setItem('token', data.token);
-			return goto('/');
-		}
-	}
-
-	function handleJumpRegister() {
-		goto('/register');
-	}
-
-	function handleJumpForgot() {
-		goto('/forgot');
-	}
+	/** @type {import('./$types').ActionData} */
+	export let form;
 </script>
+
+<svelte:head>
+	<title>登录</title>
+</svelte:head>
 
 <div class="min-h-screen flex">
 	<div
@@ -80,42 +67,34 @@
 					>
 				</div>
 
-				<form>
+				<form method="post">
 					<div class="mb-6">
 						<Label for="email" class="mb-2">Email address</Label>
-						<Input
-							bind:value={form.email}
-							type="email"
-							id="email"
-							placeholder="john.doe@company.com"
-							required
-						/>
+						<Input name="email" type="email" id="email" required />
+						{#if form?.errors?.email}
+							<Helper class="mt-2" color="red">{form.errors.email}</Helper>
+						{/if}
 					</div>
 					<div class="mb-6">
 						<Label for="password" class="mb-2">Password</Label>
-						<Input
-							bind:value={form.password}
-							type="password"
-							id="password"
-							placeholder="•••••••••"
-							required
-						/>
+						<Input name="password" type="password" id="password" placeholder="•••••••••" required />
+						{#if form?.errors?.password}
+							<Helper class="mt-2" color="red">{form.errors.password}</Helper>
+						{/if}
 					</div>
 
 					<div class="mb-6">
-						<GradientButton on:click={handleLogin} color="purpleToBlue" class="w-full"
-							>登录</GradientButton
-						>
+						<GradientButton type="submit" color="purpleToBlue" class="w-full">登录</GradientButton>
 					</div>
 
 					<div class="flex items-center justify-between mb-6">
 						<Checkbox>记住我</Checkbox>
-						<A on:click={handleJumpForgot} class="text-sm font-medium hover:underline">忘记密码</A>
+						<A href="/forgot" class="text-sm font-medium hover:underline">忘记密码</A>
 					</div>
 
 					<p class="mt-10 text-center text-md">
 						<span class="text-gray-500">没有账号？</span>
-						<A on:click={handleJumpRegister} class="font-medium hover:underline">注册</A>
+						<A href="/register" class="font-medium hover:underline">注册</A>
 					</p>
 				</form>
 			</div>

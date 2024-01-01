@@ -26,6 +26,15 @@ export default {
 					800: '#CC4522',
 					900: '#A5371B'
 				}
+			},
+			animation: {
+				fade: 'fade 0.4s'
+			},
+			keyframes: {
+				fade: {
+					from: { opacity: 0 },
+					to: { opacity: 1 }
+				}
 			}
 		}
 	}
