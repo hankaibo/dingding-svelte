@@ -8,6 +8,6 @@ export function load({ locals }) {
 			image: locals.user.photo,
 			role: locals.user.role
 		},
-		token: locals.token || null
+		token: locals.token,
 	};
 }

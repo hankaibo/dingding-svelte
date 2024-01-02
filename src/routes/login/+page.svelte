@@ -23,7 +23,7 @@
 	<title>登录</title>
 </svelte:head>
 
-<div class="min-h-screen flex">
+<div class="h-[calc(100vh-73px)] flex">
 	<div
 		class="flex flex-col sm:flex-row items-center md:items-start sm:justify-center md:justify-start flex-auto min-w-0"
 	>

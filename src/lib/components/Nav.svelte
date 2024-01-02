@@ -22,13 +22,13 @@
 			class="mr-3 h-6 sm:h-9"
 			alt="Svelte Logo"
 		/>
-		<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Hi</span>
+		<span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Svelte</span>
 	</NavBrand>
 	<div class="flex items-center md:order-2">
 		{#if $page.data.user}
 			<Avatar class="cursor-pointer" id="avatar-menu" bind:src={$page.data.user.photo} />
 		{:else}
-			<Avatar />
+			<Avatar class="cursor-pointer" id="avatar-menu" />
 		{/if}
 		<NavHamburger class1="w-full md:flex md:w-auto md:order-1" />
 	</div>
@@ -45,7 +45,7 @@
 	</Dropdown>
 	<NavUl {activeUrl}>
 		<NavLi href="/">Home</NavLi>
-		{#if $page.data?.user.role.name === 'Admin'}
+		{#if $page.data.user?.role?.name === 'Admin'}
 			<NavLi href="/user">User</NavLi>
 		{/if}
 		<NavLi href="/about">About</NavLi>

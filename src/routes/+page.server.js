@@ -3,14 +3,21 @@ import * as api from '$lib/api.js';
 /** @type {import('./$types').PageServerLoad} */
 export async function load({ locals, url }) {
 	const page = url.searchParams.get('page') ?? '1';
-	const offsetTime = url.searchParams.get('offset') || 0;
-	const hiddenEmpty = url.searchParams.get('hidden') || true;
+	const name = url.searchParams.get('name') || '';
+	const date = url.searchParams.get('date') || '';
+	const offset = url.searchParams.get('offset') || 0;
+	const hidden = url.searchParams.get('hidden') || 'on';
 
 	const params = new URLSearchParams();
 	params.set('page', page);
 	params.set('limit', '' + 1000);
+	params.set('filters', `{"name": "${name}", "date": "${date}"}`);
 
-	const res = await api.get(`attendance-report?${params}`, locals?.token);
+	const body = await api.get(`attendance-report?${params}`, locals?.token);
+
+	if (body.errors) {
+		return fail(401, body);
+	}
 
 	const {
 		reports,
@@ -21,7 +28,7 @@ export async function load({ locals, url }) {
 		sumOvertimeWeekendAfterBase,
 		sumOvertimeWeekdayAfterBase,
 		sumResttime
-	} = formatReport(res.data, { offset: offsetTime, hidden: hiddenEmpty });
+	} = formatReport(body.data, { offset, hidden: hidden === 'on' });
 
 	return {
 		reports,
@@ -34,51 +41,6 @@ export async function load({ locals, url }) {
 		sumResttime
 	};
 }
-
-/** @type {import('./$types').Actions} */
-export const actions = {
-	default: async ({ locals, request }) => {
-		const data = await request.formData();
-
-		const name = data.get('name');
-		const date = data.get('date');
-		const offset = data.get('offset') || 0;
-		const hidden = data.get('hidden');
-
-		const params = new URLSearchParams();
-		params.set('page', '1');
-		params.set('limit', '' + 1000);
-		params.set('filters', `{"name": "${name}", "date": "${date}"}`);
-
-		const body = await api.get(`attendance-report?${params}`, locals?.token);
-
-		if (body.errors) {
-			return fail(401, body);
-		}
-
-		const {
-			reports,
-			sumOvertimeWeekend,
-			sumOvertimeWeekday,
-			sumOvertimeWeekendAfter,
-			sumOvertimeWeekdayAfter,
-			sumOvertimeWeekendAfterBase,
-			sumOvertimeWeekdayAfterBase,
-			sumResttime
-		} = formatReport(body.data, { offset, hidden: hidden === 'on' });
-
-		return {
-			reports,
-			sumOvertimeWeekend,
-			sumOvertimeWeekday,
-			sumOvertimeWeekendAfter,
-			sumOvertimeWeekdayAfter,
-			sumOvertimeWeekendAfterBase,
-			sumOvertimeWeekdayAfterBase,
-			sumResttime
-		};
-	}
-};
 
 /**
  * @typedef User

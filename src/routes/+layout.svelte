@@ -1,7 +1,7 @@
 <script>
-	import { navigating } from '$app/stores';
-	import Nav from './Nav.svelte';
-	import PreloadingIndicator from './PreloadingIndicator.svelte';
+	import { navigating, page } from '$app/stores';
+	import Nav from '$lib/components/Nav.svelte';
+	import PreloadingIndicator from '$lib/components/PreloadingIndicator.svelte';
 	import '../app.css';
 </script>
 

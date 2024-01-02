@@ -1,7 +1,7 @@
 // place files you want to import through the `$lib` alias in this folder.
 import { error } from '@sveltejs/kit';
 
-const base = 'http://localhost:3000/api/v1';
+const base = 'http://47.95.120.23:3002/api/v1';
 
 /**
  * Sends a request to the server.

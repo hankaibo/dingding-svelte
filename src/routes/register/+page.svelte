@@ -24,7 +24,7 @@
 	<title>注册</title>
 </svelte:head>
 
-<div class="flex min-h-screen">
+<div class="flex h-[calc(100vh-73px)]">
 	<div class="flex flex-auto">
 		<Img
 			bind:src={data.url}
