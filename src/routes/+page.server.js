@@ -147,7 +147,8 @@ function formatReport(data, { offset, hidden }) {
 
 						let m = '00';
 						const [hour, minutes] = user.endTime.split(':');
-						if ((+hour >= 20 && +minutes >= 30) || +hour >= 21) {
+						// 加班起步时间为1小时，不足30分钟则不计。
+						if ((+hour >= 18 && +minutes >= 30) || +hour >= 19) {
 							if (+minutes < 30) {
 								m = '00';
 							} else if (+minutes < 60) {
